@@ -11,6 +11,8 @@ public class BioInfo {
 		family.calculateOcc();
 		System.out.println(family.isGoodOcc());
 		
+		System.out.println(family.getOccurences().get(""+'-'+1));
+		
 		//System.out.println(family.displayOcc());
 		
 		family.calculateWeights();

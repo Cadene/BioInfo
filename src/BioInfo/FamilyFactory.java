@@ -10,32 +10,6 @@ public class FamilyFactory {
 
 	private static String dataPath = "./data/";
 
-	static void test()
-	{
-		int c;
-		try 
-		{
-			BufferedReader br = new BufferedReader(new FileReader(dataPath +  "Dtrain.txt"));
-			int i = 0;
-			while ((c = br.read()) != -1)
-			{
-				if(i==24)
-					System.out.print(c);
-				i++;
-			}
-			br.close();	
-		}
-
-		catch (FileNotFoundException exc)
-		{
-			System.out.println ("File not found");
-		}
-		catch (IOException ioe)
-		{
-			System.out.println ("Erreur IO");
-		}
-	}
-	
 	static Family makeFamily(String path)
 	{
 		int c;

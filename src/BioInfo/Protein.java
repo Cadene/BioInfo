@@ -15,10 +15,20 @@ public class Protein {
 	public String getAAList(){
 		return AAList;
 	}
+	public char getAA(int i){
+		return AAList.charAt(i);
+	}
 	
+	public int length(){
+		return AAList.length();
+	}
 	
 	public String toString(){
-		return protName + "\n" + AAList;
+		String s = "";
+		s += "nom: " + protName + "\n";
+		s += "longueur: " + this.length() + "\n";
+		s += AAList;
+		return s;
 	}
 
 }

@@ -1,68 +1,73 @@
 package BioInfo;
 
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Family {
 
-	private ArrayList<Protein> proteins;
-	private int q;
-	private HashMap<String, Integer> occurences;
-	private HashMap<String, Double> weights;
-	private HashMap<Integer, Double> rEntropy;
-
 	private ArrayList<Character> AATypes; 
 	
-	public Family(ArrayList<Protein> proteins, int q){
+	private ArrayList<Protein> proteins;
+	
+	private HashMap<String, Integer> numbers;
+	private HashMap<String, Double> weights;
+	private ArrayList<Double> REntropy;
+	private HashMap<Character, Double> NFrequency;
+	
+	private HashMap<String, Integer> numbers2;
+	private HashMap<String, Double> weights2;
+	private HashMap<String, Double> mutualInfo;
+	
+	
+	/* Constructeurs */
+	
+	public Family(ArrayList<Protein> proteins)
+	{
+		this.AATypes = FamilyFactory.makeAAList();
+		
 		this.proteins = proteins;
-		this.q = q;
-		this.occurences = new HashMap<String,Integer>();
+		
+		this.numbers = new HashMap<String,Integer>();
 		this.weights = new HashMap<String,Double>();
-		this.rEntropy = new HashMap<Integer,Double>();
-		AATypes = new ArrayList<Character>();
-		AATypes.add('A');
-		AATypes.add('C');
-		AATypes.add('D');
-		AATypes.add('E');
-		AATypes.add('F');
-		AATypes.add('G');
-		AATypes.add('H');
-		AATypes.add('I');
-		AATypes.add('K');
-		AATypes.add('L');
-		AATypes.add('M');
-		AATypes.add('N');
-		AATypes.add('P');
-		AATypes.add('Q');
-		AATypes.add('R');
-		AATypes.add('S');
-		AATypes.add('T');
-		AATypes.add('V');
-		AATypes.add('W');
-		AATypes.add('Y');
-		AATypes.add('-');
+		this.REntropy = new ArrayList<Double>();
+		this.NFrequency = new HashMap<Character, Double>();
+		
+		this.numbers2 = new HashMap<String,Integer>();
+		this.weights2 = new HashMap<String,Double>();
+		this.mutualInfo = new HashMap<String,Double>();
 	}
+	
+	/* Getters */
+	
 	public ArrayList<Protein> getProteins(){
 		return proteins;
 	}
 	public HashMap<String,Integer> getOccurences(){
-		return occurences;
+		return numbers;
 	}
 	public HashMap<String,Double> getWeights(){
 		return weights;
 	}
-	public Double getWeight(char a,int i){
-		return weights.get(""+a+i);
+	public String getAA(int i){
+		return AATypes.get(i).toString();
+	}
+	public ArrayList<Character> getAATypes(){
+		return AATypes;
 	}
 	public int getQ(){
-		return q;
+		return AATypes.size();
 	}
 	public int getM(){
 		return this.proteins.size();
 	}
-	public double getREntropy(int i){
-		return this.rEntropy.get(i);
+	public int getL(){
+		return this.proteins.get(0).length();
 	}
+	
+	
+	/* toString */
 	
 	public String toString(int length){
 		String s = "";
@@ -72,7 +77,18 @@ public class Family {
 		return s;
 	}
 	
-	public void calculateOcc(){
+	public String toString(){
+		String s = "";
+		s += "Nb AA differents (q) : " + getQ() + "\n";
+		s += "Taille (M) : " + getM() + "\n";
+		s += "Longueur (L) : " + getL() + "\n";
+		return s;
+	}
+	
+	
+	/* Occurences */
+	
+	public void calculateNum(){
 		Integer actualInt;
 		String actualAA;
 		
@@ -82,30 +98,40 @@ public class Family {
 			for(int i=0; i<p.getAAList().length(); i++){
 				
 				actualAA = "" + p.getAAList().charAt(i) + i;
-				actualInt = this.occurences.get(actualAA);
+				actualInt = this.numbers.get(actualAA);
 				if(actualInt == null){
-					this.occurences.put(actualAA , new Integer(1));
+					this.numbers.put(actualAA , new Integer(1));
 				}else{
 					actualInt++;
-					this.occurences.put(actualAA, actualInt);
+					this.numbers.put(actualAA, actualInt);
 				}
 			}
 		}
 	}
-	public String displayOcc(){
+	
+	public String displayNum(){
 		String s = "";
-		for(String AA : this.occurences.keySet()){
-			s += "[ " + AA + ", " + this.occurences.get(AA) + " ]\n";
+		for(String AA : this.numbers.keySet()){
+			s += "[ " + AA + ", " + this.numbers.get(AA) + " ]\n";
 		}
 		return s;
 	}
-	public boolean isGoodOcc(){
+	
+	public int getNumber(char a, int i)
+	{
+		Integer temp = numbers.get(""+a+i);
+		if(temp == null)
+			return 0;
+		return temp;
+	}
+	
+	public boolean isGoodNum(){
 		int value;
 		Integer inter;
-		for(int i=0; i< this.q; i++){
+		for(int i=0; i< this.getQ(); i++){
 			value=0;
 			for(Character c : this.AATypes){
-				inter = this.occurences.get(""+c+i);
+				inter = this.numbers.get(""+c+i);
 				if(inter != null)
 					value += inter;
 			}
@@ -116,15 +142,28 @@ public class Family {
 		return true;
 	}
 	
-	public void calculateWeights(){
-		for(String AA : this.occurences.keySet()){
-			this.weights.put(AA, 
-					(this.occurences.get(AA) + 1)
+	
+	/* Poids */
+	
+	public void calculateWeights()
+	{
+		int temp;
+		for(String AA : this.numbers.keySet())
+		{
+			temp = this.numbers.get(AA);
+			
+			if (temp != 0) // optimisation
+			{
+				this.weights.put(AA, 
+					(temp + 1)
 					/
 					(double) (this.getM() + this.getQ()));
+			}
 		}
 	}
-	public String displayWeights(){
+	
+	public String displayWeights()
+	{
 		String s = "";
 		for(String AA : this.weights.keySet()){
 			s += "[ " + AA + ", " + this.weights.get(AA) + " ]\n";
@@ -132,33 +171,261 @@ public class Family {
 		return s;
 	}
 	
-	public void calculateREntropy(){
+	public double getWeight(char a,int i)
+	{
+		Double rslt = weights.get(""+a+i);
+		
+		if(rslt != null){
+			return rslt;
+		}else{
+			return 1/ (double)(getM()+getQ());
+		}
+	}
+	
+	
+	/* Entropie relative */
+	
+	public void calculateREntropy()
+	{
 		double log2 = Math.log(2);
 		double log2Q = Math.log(this.getQ()) / log2;
 		double value;
-		Double inter;
-		for(int i=0; i< this.getQ(); i++){
+		double temp;
+		
+		for(int i=0; i< this.getQ(); i++)
+		{
 			value = log2Q;
-			for(Character AA : this.AATypes){
-				inter = this.getWeight(AA,i);
-				if(inter != null){
-					value += inter * (Math.log(inter) / log2);
-				}
+			for(Character AA : this.AATypes)
+			{
+				temp = this.getWeight(AA,i);
+				value += temp * (Math.log(temp) / log2);
 			}
-			this.rEntropy.put(i,value);
+			this.REntropy.add(i,value);
 		}
 	}
+	
 	public String displayREntropy(){
 		String s = "";
 		for(int i=0; i< this.getQ(); i++){
-			s += "[ " + i + ", " + this.rEntropy.get(i) + " ]\n";
+			s += "[ " + i + ", " + this.REntropy.get(i) + " ]\n";
 		}
 		return s;
 	}
 	
-	public void calculateMConservedAA(){
-		
+	public double getREntropy(int i){
+		return this.REntropy.get(i);
 	}
+	
+	public void generateCurveREntropy()
+	{
+		try
+		{
+            String fileName = "./data/REntropy.txt";
+            PrintWriter out  = new PrintWriter(new FileWriter(fileName));
+            
+            for(int i=0; i < this.getQ(); i++)
+            {
+            	out.println(i + " " + this.getAA(i) + " " + REntropy.get(i));
+            }
+         
+            out.close();
+	    }
+	    catch(Exception e){
+	      e.printStackTrace();
+	    }
+	}
+	
+	
+	/* Frequence du modele nul */
+	
+	public void calculateNFrequency()
+	{
+		double value;
+		
+		for(Character AA : AATypes)
+		{
+			value = 0;
+			for(int i=0; i< getL(); i++)
+			{
+				value += getWeight(AA.charValue(),i);
+			}
+			value /= getL();
+			NFrequency.put(AA,value);
+		}
+	}
+	
+	public String displayNFrequency()
+	{
+		String s = "";
+		for(Character AA : AATypes)
+		{
+			s += "[ " + AA + ", " + NFrequency.get(AA) + " ]\n";
+		}
+		return s;
+	}
+	
+	public double getNFrequency(char a)
+	{
+		return NFrequency.get(a);
+	}
+	
+	
+	/* log-vraisemblance */
+	
+	
+	public double getLogOddsRatio(Protein p, int begin)
+	{
+		double log2 = Math.log(2);
+		double rslt = 0;
+		
+		for(int i = begin; i < this.getL(); i++)
+		{
+			rslt += Math.log(	
+						this.getWeight(p.getAA(i), i)	/
+						this.getNFrequency(p.getAA(i))
+					)	/ log2;
+		}
+		
+		return rslt;
+	}
+	
+	public ArrayList<Double> getLogOddsRatio(Protein p)
+	{
+		int max = p.length()-getL();
+		ArrayList<Double> logs= new ArrayList<Double>(max);
+		
+		for(int i=0; i<max; i++)
+		{
+			logs.add(getLogOddsRatio(p,i));
+		}
+		
+		return logs;
+	}
+	
+	public void generateCurveLOR(Protein p)
+	{
+		ArrayList<Double> logs;
+		try
+		{
+            String fileName = "./data/LogOddsRatio.txt";
+            PrintWriter out  = new PrintWriter(new FileWriter(fileName));
+            
+            logs = getLogOddsRatio(p);
+            
+            for(int i=0; i < logs.size(); i++)
+            {
+            	out.println(i + " " + logs.get(i));
+            }
+         
+            out.close();
+	    }
+	    catch(Exception e){
+	      e.printStackTrace();
+	    }
+	}
+	
+	
+	/* Occurences doubles*/
+	
+	public void calculateNum2()
+	{
+		Integer actualInt;
+		String actualAAi, actualAAj, actualAA;
+		
+		for(Protein p : proteins)
+		{
+			for(int i=0; i<p.getAAList().length(); i++)
+			{	
+				actualAAi = "" + p.getAAList().charAt(i) + i;
+				
+				for(int j=i+1; j<p.getAAList().length(); j++)
+				{
+					actualAAj = "" + p.getAAList().charAt(j) + j;
+					
+					actualAA = actualAAi + actualAAj;
+					
+					actualInt = this.numbers2.get(actualAA);
+					
+					if(actualInt == null)
+						actualInt = new Integer(1);
+					else
+						actualInt++;
+
+					this.numbers2.put(actualAA, actualInt);
+					
+					//System.out.println(actualAAi + "," + actualAAj + " : " + actualInt);
+				}
+				
+			}
+		}
+	}
+	
+	public int getNumber2(char a, int i, char b, int j)
+	{
+		Integer temp = numbers2.get(""+a+i+b+j);
+		if (temp == null)
+			return 0;
+		return temp;
+	}
+	
+	
+	/* Poids doubles */
+	
+	public void calculateWeights2()
+	{
+		int temp;
+		
+		for(String AAd : this.numbers2.keySet())
+		{
+			temp = this.numbers2.get(AAd);
+			
+			if(temp != 0) // si =0 on ne stock pas dans la HM, mais on genere avec getWeight2
+			{
+				this.weights2.put(AAd, 
+					(temp + 1/ (double) this.getQ())
+					/
+					(double) (this.getM() + this.getQ()));
+			}
+		}
+	}
+	
+	public double getWeight2(char a, int i, char b, int j)
+	{
+		Double rslt = weights2.get(""+a+i+b+j);
+		
+		if(rslt != null){
+			return rslt;
+		}else{
+			return (1/(double) getQ()) / (double)(getM()+getQ());
+		}
+	}
+	
+	
+	/* Information mutuelle */
+	
+	public void calculateMutualInfo()
+	{
+		double temp;
+		double log2 = Math.log(2);
+		
+		for(int i=0; i< getL(); i++)
+		{
+			for(int j=0; i< getL(); j++)
+			{
+				for(Character a : this.getAATypes())
+				{
+					for(Character b : this.getAATypes())
+					{
+						temp = this.getWeight2(a, i, b, j);
+						temp *= Math.log( temp / ( this.getWeight(a, i) * this.getWeight(b, j) ) ) / log2;
+						this.mutualInfo.put(i+":"+j, temp);
+					}
+				}
+			}
+		}
+	}
+	
+	
 	
 	
 }

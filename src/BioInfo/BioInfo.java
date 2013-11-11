@@ -68,7 +68,7 @@ public class BioInfo {
 		string += "Calcule des poids doubles ... ";
 		string = BioInfo.afficher(string);
 		string += "done !\n";
-		family.calculateWeights2();
+			family.calculateWeights2();
 		
 		string += family.getWeight2('A',38,'-',43) + "\n";
 		string += family.getWeight2('-',43,'A',38) + "\n";

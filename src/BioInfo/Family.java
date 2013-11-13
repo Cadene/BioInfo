@@ -36,7 +36,7 @@ public class Family {
 		
 		this.numbers2 = new HashMap<String,Integer>();
 		this.weights2 = new HashMap<String,Double>();
-		this.mutualInfo = new HashMap<String,Double>();
+		this.mutualInfo = new HashMap<String,Double>(2162,(float) 0.70);
 	}
 	
 	/* Getters */
@@ -410,7 +410,7 @@ public class Family {
 		
 		for(int i=0; i< getL(); i++)
 		{
-			for(int j=0; i< getL(); j++)
+			for(int j=0; j< getL(); j++)
 			{
 				for(Character a : this.getAATypes())
 				{
@@ -422,8 +422,16 @@ public class Family {
 					}
 				}
 			}
+			
 		}
 	}
+	
+	public Double getMutualInfo(int i, int j)
+	{
+		return this.mutualInfo.get(i+":"+j);
+	}
+	
+	
 	
 	
 	

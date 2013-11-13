@@ -57,8 +57,8 @@ public class BioInfo {
 		
 		string += "Calcule des occurences doubles ... ";
 		string = BioInfo.afficher(string);
-		string += "done !\n";
 		family.calculateNum2();
+		string += "done !\n";
 		
 		string += family.getNumber2('A',38,'-',43) + "\n";
 		string += family.getNumber2('-',43,'A',38) + "\n";
@@ -67,12 +67,27 @@ public class BioInfo {
 		
 		string += "Calcule des poids doubles ... ";
 		string = BioInfo.afficher(string);
+		family.calculateWeights2();
 		string += "done !\n";
-			family.calculateWeights2();
 		
 		string += family.getWeight2('A',38,'-',43) + "\n";
 		string += family.getWeight2('-',43,'A',38) + "\n";
 		string += "\n";
+		
+		
+		//string += family.getAATypes().size() + "\n";
+		//string += family.getL() + "\n";
+		
+		string += "Calcule de la matrice d'info mutuelle ... ";
+		string = BioInfo.afficher(string);
+		family.calculateMutualInfo();
+		string += "done !\n";
+		
+		string += family.getMutualInfo(0,1) + "\n";
+		string += family.getMutualInfo(1,0) + "\n";
+		string += "\n";
+		
+		
 		
 		/*int i = 49;
 		string += family.getWeight(protein.getAA(i), i);*/

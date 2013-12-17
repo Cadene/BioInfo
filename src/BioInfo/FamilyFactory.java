@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class FamilyFactory {
 
@@ -84,5 +85,58 @@ public class FamilyFactory {
 		AATypes.add('Y');
 		AATypes.add('-');
 		return AATypes;
+	}
+
+	public static HashMap<String, Double> makeDistances()
+	{
+		
+		int c = 1;
+		String pos = "";
+		String dist = "";
+		int nbPos;
+		HashMap<String, Double> distances = new HashMap<String, Double>();
+		
+		try 
+		{
+			BufferedReader br = new BufferedReader(new FileReader(dataPath + "distances.txt"));
+			
+			while (c != -1)
+			{
+				nbPos=0;
+				pos = "";
+				while ((c = br.read()) != -1)
+				{	
+					if(c == 32) // ' '
+						nbPos++;
+					if(nbPos==2)
+						break;
+					pos += (char)c;
+				}
+				
+				dist = "";
+				while ((c = br.read())  != -1 && c != '\n')
+				{
+					dist += (char)c;
+				}
+				
+				//System.out.println(pos + " : " + dist);
+				if(!dist.isEmpty())
+					distances.put(pos, new Double(dist));
+				
+			}
+			
+			br.close();	
+			return distances;
+		}
+
+		catch (FileNotFoundException exc)
+		{
+			System.out.println ("File not found");
+		}
+		catch (IOException ioe)
+		{
+			System.out.println ("Erreur IO");
+		}
+		return null;
 	}
 }
